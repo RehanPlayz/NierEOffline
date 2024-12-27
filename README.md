@@ -8,7 +8,7 @@ Python script to patch Nier: Automata's executable to achieve Ending E while off
 ## **Usage Instructions**
 
 ### Using the Prebuilt Executable:
-1. Place the exe in the same folder as the game's executable (`NieRAutomata.exe`).
+1. Place the exe (`NierPatch.exe`) in the same folder as the game's executable (`NieRAutomata.exe`).
 2. Run the exe.
 3. The tool will create a backup (`NieRAutomata.exe.bak`) and apply the patch.
 4. Launch the game and enjoy!
@@ -18,7 +18,7 @@ Python script to patch Nier: Automata's executable to achieve Ending E while off
 2. Place the script in the same folder as the game's executable (`NieRAutomata.exe`).
 3. Run the script:
    ```bash
-   python patch_exe.py
+   python NierPatch.py
    ```
 4. The tool will create a backup (`NieRAutomata.exe.bak`) and apply the patch.
 5. Launch the game and enjoy!
