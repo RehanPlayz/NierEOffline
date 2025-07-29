@@ -1,0 +1,88 @@
+name: Build Executable
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install Nuitka
+      run: pip install nuitka
+    
+    - name: Build Windows
+      if: runner.os == 'Windows'
+      run: |
+        python -m nuitka --onefile --mingw64 --output-filename=NierPatch.exe --remove-output --assume-yes-for-downloads NierPatch.py
+    
+    - name: Build Linux
+      if: runner.os == 'Linux'
+      run: |
+        python -m nuitka --onefile --output-filename=NierPatch --remove-output NierPatch.py
+    
+    - name: Build macOS
+      if: runner.os == 'macOS'
+      run: |
+        python -m nuitka --onefile --output-filename=NierPatch --remove-output NierPatch.py
+    
+    - name: Upload Windows
+      if: runner.os == 'Windows'
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows
+        path: NierPatch.exe
+    
+    - name: Upload Linux
+      if: runner.os == 'Linux'
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux
+        path: NierPatch
+    
+    - name: Upload macOS
+      if: runner.os == 'macOS'
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos
+        path: NierPatch
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/download-artifact@v4
+    
+    - name: Prepare files
+      run: |
+        cp windows/NierPatch.exe NierPatch-Windows.exe
+        cp linux/NierPatch NierPatch-Linux
+        cp macos/NierPatch NierPatch-macOS
+        chmod +x NierPatch-Linux NierPatch-macOS
+    
+    - uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        files: |
+          NierPatch-Windows.exe
+          NierPatch-Linux
+          NierPatch-macOS
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
